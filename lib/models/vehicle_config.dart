@@ -4,46 +4,6 @@ import 'package:json_annotation/json_annotation.dart';
 part 'vehicle_config.g.dart';
 
 // -----------------------------------------------------------------------------
-// 1. THE STATE MANAGER (CONTROLLER)
-// -----------------------------------------------------------------------------
-// This is the class you will use in main.dart with ChangeNotifierProvider.
-// It exposes methods to update specific parts of the car configuration.
-class VehicleNotifier extends ChangeNotifier {
-  VehicleConfig _config;
-
-  VehicleNotifier(this._config);
-
-  VehicleConfig get config => _config;
-
-  // -- UPDATE METHODS --
-
-  void updateChassis(ChassisConfig newChassis) {
-    _config = _config.copyWith(chassis: newChassis);
-    notifyListeners();
-  }
-
-  void updateAero(AeroConfig newAero) {
-    _config = _config.copyWith(aero: newAero);
-    notifyListeners();
-  }
-
-  void updatePowertrain(PowertrainConfig newPowertrain) {
-    _config = _config.copyWith(powertrain: newPowertrain);
-    notifyListeners();
-  }
-
-  void updateTires(TireConfig newTires) {
-    _config = _config.copyWith(tires: newTires);
-    notifyListeners();
-  }
-
-  void updateKinematics(KinematicsConfig newKinematics) {
-    _config = _config.copyWith(kinematics: newKinematics);
-    notifyListeners();
-  }
-}
-
-// -----------------------------------------------------------------------------
 // 2. THE DATA MODELS (IMMUTABLE)
 // -----------------------------------------------------------------------------
 

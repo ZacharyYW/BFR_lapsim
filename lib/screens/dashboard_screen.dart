@@ -5,6 +5,7 @@ import 'package:fl_chart/fl_chart.dart'; // Ensure fl_chart is in pubspec.yaml
 import '../models/vehicle_config.dart';
 import '../models/simulation_result.dart';
 import '../services/simulation_service.dart';
+import '../notifiers/vehicle_notifier.dart';
 
 // Import the sub-components we will create next
 import '../widgets/config_tabs/aero_tab.dart';
