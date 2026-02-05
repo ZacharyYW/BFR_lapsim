@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/vehicle_config.dart';
+import 'package:laptime_simulator/models/vehicle_config.dart'; // Standardized import
 
 class VehicleNotifier extends ChangeNotifier {
   VehicleConfig _config;

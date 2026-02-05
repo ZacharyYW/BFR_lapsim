@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../models/vehicle_config.dart';
-import '../param_input.dart';
+import 'package:laptime_simulator/models/vehicle_config.dart'; 
+import 'package:laptime_simulator/widgets/param_input.dart';
+import 'package:laptime_simulator/notifiers/vehicle_notifier.dart';
 
 class AeroTab extends StatelessWidget {
   const AeroTab({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final notifier = Provider.of<VehicleNotifier>(context);
+    // Now the compiler knows what VehicleNotifier is
+    final notifier = Provider.of<VehicleNotifier>(context); 
     final aero = notifier.config.aero;
 
     return ListView(

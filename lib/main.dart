@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'models/vehicle_config.dart';
-import 'services/simulation_service.dart';
-import 'screens/dashboard_screen.dart'; 
-import 'notifiers/vehicle_notifier.dart'; // <--- Now importing correctly
+// Use package imports to avoid type conflicts
+import 'package:laptime_simulator/models/vehicle_config.dart';
+import 'package:laptime_simulator/services/simulation_service.dart';
+import 'package:laptime_simulator/screens/dashboard_screen.dart';
+import 'package:laptime_simulator/notifiers/vehicle_notifier.dart';
 
 void main() {
   final service = SimulationService();
-  
+
   runApp(
     MultiProvider(
       providers: [
@@ -16,15 +17,16 @@ void main() {
         ChangeNotifierProvider<VehicleNotifier>(
           create: (_) => VehicleNotifier(
             VehicleConfig(
-              chassis: ChassisConfig(),
-              aero: AeroConfig(),
-              powertrain: PowertrainConfig(
-                  engineRpm: [6200, 14100], 
-                  engineTorque: [40, 53],
-                  gearRatios: [3.2, 2.5, 1.8, 1.4, 1.1]
+              chassis: const ChassisConfig(),
+              aero: const AeroConfig(),
+              powertrain: const PowertrainConfig(
+                // FIX: Use .0 to ensure these are doubles, not ints
+                engineRpm: [6200.0, 14100.0],
+                engineTorque: [40.0, 53.0],
+                gearRatios: [3.2, 2.5, 1.8, 1.4, 1.1],
               ),
-              tires: TireConfig(),
-              kinematics: KinematicsConfig(),
+              tires: const TireConfig(),
+              kinematics: const KinematicsConfig(),
             ),
           ),
         ),
@@ -40,7 +42,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Optimum Mindstorm',
+      title: 'Brown Formula Racing',
       theme: ThemeData(
         brightness: Brightness.dark,
         primarySwatch: Colors.blue,

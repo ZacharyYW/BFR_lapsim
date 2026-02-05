@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../models/vehicle_config.dart';
-import '../param_input.dart';
+import 'package:laptime_simulator/models/vehicle_config.dart';
+import 'package:laptime_simulator/widgets/param_input.dart';
+import 'package:laptime_simulator/notifiers/vehicle_notifier.dart';
 
 class KinematicsTab extends StatelessWidget {
   const KinematicsTab({super.key});
