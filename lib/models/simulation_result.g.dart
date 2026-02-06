@@ -24,6 +24,22 @@ SimulationResult _$SimulationResultFromJson(Map<String, dynamic> json) =>
           (json['longAccelTrace'] as List<dynamic>)
               .map((e) => (e as num).toDouble())
               .toList(),
+      xTraceEndurance:
+          (json['xTraceEndurance'] as List<dynamic>)
+              .map((e) => (e as num).toDouble())
+              .toList(),
+      yTraceEndurance:
+          (json['yTraceEndurance'] as List<dynamic>)
+              .map((e) => (e as num).toDouble())
+              .toList(),
+      xTraceAutocross:
+          (json['xTraceAutocross'] as List<dynamic>)
+              .map((e) => (e as num).toDouble())
+              .toList(),
+      yTraceAutocross:
+          (json['yTraceAutocross'] as List<dynamic>)
+              .map((e) => (e as num).toDouble())
+              .toList(),
       enduranceScore: (json['enduranceScore'] as num).toDouble(),
       autocrossScore: (json['autocrossScore'] as num).toDouble(),
       skidpadScore: (json['skidpadScore'] as num).toDouble(),
@@ -37,6 +53,10 @@ Map<String, dynamic> _$SimulationResultToJson(SimulationResult instance) =>
       'velocityTrace': instance.velocityTrace,
       'latAccelTrace': instance.latAccelTrace,
       'longAccelTrace': instance.longAccelTrace,
+      'xTraceEndurance': instance.xTraceEndurance,
+      'yTraceEndurance': instance.yTraceEndurance,
+      'xTraceAutocross': instance.xTraceAutocross,
+      'yTraceAutocross': instance.yTraceAutocross,
       'enduranceScore': instance.enduranceScore,
       'autocrossScore': instance.autocrossScore,
       'skidpadScore': instance.skidpadScore,

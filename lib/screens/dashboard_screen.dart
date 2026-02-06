@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:fl_chart/fl_chart.dart'; // Ensure fl_chart is in pubspec.yaml
 
+import '../services/simulation_service.dart';
 import '../models/vehicle_config.dart';
 import '../models/simulation_result.dart';
-import '../services/simulation_service.dart';
 import '../notifiers/vehicle_notifier.dart';
 
-// Import the sub-components we will create next
-import '../widgets/config_tabs/aero_tab.dart';
 import '../widgets/config_tabs/chassis_tab.dart';
+import '../widgets/config_tabs/aero_tab.dart';
 import '../widgets/config_tabs/powertrain_tab.dart';
 import '../widgets/config_tabs/tires_tab.dart';
 import '../widgets/config_tabs/kinematics_tab.dart';
 
+// Import new tabs
 import '../tabs/analysis_tab.dart';
+import '../tabs/track_map_tab.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -24,28 +24,29 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  SimulationResult? _result;
-  bool _isLoading = false;
+  int _selectedIndex = 0;
+  bool _isSimulating = false;
+  SimulationResult? _simulationResult;
 
-  Future<void> _runSimulation() async {
-    setState(() => _isLoading = true);
-    
-    final notifier = Provider.of<VehicleNotifier>(context, listen: false);
-    final config = notifier.config; 
-
-    final service = Provider.of<SimulationService>(context, listen: false);
+  void _runSimulation() async {
+    setState(() => _isSimulating = true);
 
     try {
+      final config = Provider.of<VehicleNotifier>(context, listen: false).config;
+      final service = Provider.of<SimulationService>(context, listen: false);
+
       final result = await service.runSimulation(config);
+
       setState(() {
-        _result = result;
-        _isLoading = false;
+        _simulationResult = result;
+        _selectedIndex = 5; // Auto-switch to Analysis tab on success
       });
     } catch (e) {
-      setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Simulation Failed: $e")),
+        SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red),
       );
+    } finally {
+      setState(() => _isSimulating = false);
     }
   }
 
@@ -53,174 +54,73 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Brown Formula Racing // Lap Sim"),
+        title: const Text('Optimum Mindstorm Dashboard'),
         actions: [
-          if (_isLoading)
-            const Center(child: Padding(
-              padding: EdgeInsets.only(right: 20),
-              child: CircularProgressIndicator(color: Colors.white),
-            ))
-          else
-            FilledButton.icon(
-              onPressed: _runSimulation,
-              icon: const Icon(Icons.play_arrow),
-              label: const Text("RUN SIMULATION"),
-              style: FilledButton.styleFrom(
+          Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: ElevatedButton.icon(
+              onPressed: _isSimulating ? null : _runSimulation,
+              icon: _isSimulating 
+                  ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)) 
+                  : const Icon(Icons.play_arrow),
+              label: Text(_isSimulating ? "Running..." : "RUN SIMULATION"),
+              style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
                 foregroundColor: Colors.white,
               ),
             ),
-          const SizedBox(width: 20),
+          ),
         ],
       ),
       body: Row(
         children: [
-          // LEFT PANEL: Configuration
-          Expanded(
-            flex: 2,
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border(right: BorderSide(color: Colors.grey.shade300)),
-              ),
-              child: DefaultTabController(
-                length: 5,
-                child: Column(
-                  children: [
-                    const TabBar(
-                      isScrollable: true,
-                      labelColor: Colors.blue,
-                      unselectedLabelColor: Colors.grey,
-                      tabs: [
-                        Tab(text: "Chassis"),
-                        Tab(text: "Aero"),
-                        Tab(text: "Powertrain"),
-                        Tab(text: "Tires"),
-                        Tab(text: "Kinematics"),
-                      ],
-                    ),
-                    Expanded(
-                      child: TabBarView(
-                        children: const [
-                          ChassisTab(),
-                          AeroTab(),
-                          PowertrainTab(),
-                          TireTab(),
-                          KinematicsTab(),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+          NavigationRail(
+            selectedIndex: _selectedIndex,
+            onDestinationSelected: (int index) {
+              setState(() {
+                _selectedIndex = index;
+              });
+            },
+            labelType: NavigationRailLabelType.all,
+            backgroundColor: const Color(0xFF1E1E2C),
+            selectedIconTheme: const IconThemeData(color: Colors.blueAccent),
+            unselectedIconTheme: const IconThemeData(color: Colors.white54),
+            selectedLabelTextStyle: const TextStyle(color: Colors.blueAccent),
+            unselectedLabelTextStyle: const TextStyle(color: Colors.white54),
+            // NOTE: This list uses 'const' which is fine because these icons/text ARE constant
+            destinations: const [
+              NavigationRailDestination(icon: Icon(Icons.directions_car), label: Text('Chassis')),
+              NavigationRailDestination(icon: Icon(Icons.air), label: Text('Aero')),
+              NavigationRailDestination(icon: Icon(Icons.bolt), label: Text('Power')),
+              NavigationRailDestination(icon: Icon(Icons.donut_large), label: Text('Tires')),
+              NavigationRailDestination(icon: Icon(Icons.pivot_table_chart), label: Text('Kinematics')),
+              NavigationRailDestination(icon: Icon(Icons.analytics), label: Text('Analysis')),
+              NavigationRailDestination(icon: Icon(Icons.map), label: Text('Track Map')),
+            ],
           ),
-
-          // RIGHT PANEL: Results
+          const VerticalDivider(thickness: 1, width: 1),
+          // We use Expanded to fill the rest of the screen
           Expanded(
-            flex: 3,
-            child: _result == null
-                ? const Center(child: Text("Ready to Simulate"))
-                : _ResultsPanel(result: _result!),
+            child: _buildContent(),
           ),
         ],
       ),
     );
   }
-}
 
-// --- Internal Widget for Results Visualization ---
-class _ResultsPanel extends StatelessWidget {
-  final SimulationResult result;
-
-  const _ResultsPanel({required this.result});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        // 1. Scorecards
-        Row(
-          children: [
-            _ScoreCard(title: "Total Points", value: result.totalPoints, isMain: true),
-            _ScoreCard(title: "Endurance", value: result.enduranceScore),
-            _ScoreCard(title: "Autocross", value: result.autocrossScore),
-          ],
-        ),
-        const SizedBox(height: 20),
-        
-        // 2. Telemetry Chart (Velocity)
-        const Text("Velocity Trace", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-        const SizedBox(height: 10),
-        SizedBox(
-          height: 300,
-          child: LineChart(
-            LineChartData(
-              gridData: const FlGridData(show: true),
-              titlesData: const FlTitlesData(
-                bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 30)),
-                leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 40)),
-                topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              ),
-              borderData: FlBorderData(show: true),
-              lineBarsData: [
-                LineChartBarData(
-                  spots: [
-                    for (int i = 0; i < result.timeTrace.length; i += 5)
-                      FlSpot(result.timeTrace[i], result.velocityTrace[i]),
-                  ],
-                  
-                  isCurved: true,
-                  color: Colors.blue,
-                  barWidth: 3, 
-                  
-                  dotData: const FlDotData(show: false), 
-                  
-                  belowBarData: BarAreaData(
-                    show: true, 
-                    color: Colors.blue.withOpacity(0.2),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _ScoreCard extends StatelessWidget {
-  final String title;
-  final double value;
-  final bool isMain;
-
-  const _ScoreCard({required this.title, required this.value, this.isMain = false});
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Card(
-        color: isMain ? Colors.blue.shade50 : null,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Text(title, style: TextStyle(color: Colors.grey.shade700)),
-              const SizedBox(height: 5),
-              Text(
-                value.toStringAsFixed(1),
-                style: TextStyle(
-                  fontSize: isMain ? 32 : 24,
-                  fontWeight: FontWeight.bold,
-                  color: isMain ? Colors.blue : Colors.black,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+  // We use a switch statement here instead of a list. 
+  // This avoids the "Not a constant expression" error because we are not
+  // trying to put dynamic data (result) into a const list.
+  Widget _buildContent() {
+    switch (_selectedIndex) {
+      case 0: return const ChassisTab();
+      case 1: return const AeroTab();
+      case 2: return const PowertrainTab();
+      case 3: return const TiresTab();
+      case 4: return const KinematicsTab();
+      case 5: return AnalysisTab(result: _simulationResult);
+      case 6: return TrackMapTab(result: _simulationResult);
+      default: return const SizedBox();
+    }
   }
 }

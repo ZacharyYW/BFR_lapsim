@@ -39,14 +39,17 @@ class AnalysisTab extends StatelessWidget {
 
   // --- WIDGET: FRICTION CIRCLE (GGV) ---
   Widget _buildGGVChart(SimulationResult data) {
-    // Downsample data for performance (plot every 5th point)
     final spots = <ScatterSpot>[];
     for (int i = 0; i < data.latAccelTrace.length; i += 5) {
       spots.add(ScatterSpot(
         data.latAccelTrace[i], 
         data.longAccelTrace[i],
-        radius: 2,
-        color: _getColorForG(data.latAccelTrace[i], data.longAccelTrace[i]),
+        // UPDATED FOR NEW FL_CHART API
+        dotPainter: FlDotCirclePainter(
+          radius: 2,
+          color: _getColorForG(data.latAccelTrace[i], data.longAccelTrace[i]),
+          strokeWidth: 0,
+        ),
       ));
     }
 
@@ -64,7 +67,7 @@ class AnalysisTab extends StatelessWidget {
           minY: -2.5, maxY: 2.5,
           gridData: FlGridData(show: true, drawVerticalLine: true),
           borderData: FlBorderData(show: true, border: Border.all(color: Colors.white12)),
-          titlesData: FlTitlesData(show: false), // Hide numbers for cleaner look
+          titlesData: FlTitlesData(show: false),
         ),
       ),
     );
@@ -111,7 +114,6 @@ class AnalysisTab extends StatelessWidget {
     );
   }
 
-  // Helper for consistent chart styling
   Widget _buildLineChartContainer(String title, List<FlSpot> points, Color color) {
     return Container(
       height: 200,
@@ -145,7 +147,6 @@ class AnalysisTab extends StatelessWidget {
     );
   }
 
-  // Helper to color-code the friction circle
   Color _getColorForG(double lat, double long) {
     double magnitude = (lat * lat) + (long * long);
     if (magnitude > 2.0) return Colors.red;

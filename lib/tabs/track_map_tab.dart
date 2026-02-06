@@ -18,7 +18,7 @@ class _TrackMapTabState extends State<TrackMapTab> {
   @override
   Widget build(BuildContext context) {
     if (widget.result == null) {
-      return const Center(child: Text("Run simulation to view track map."));
+      return const Center(child: Text("Run simulation to view track map.", style: TextStyle(color: Colors.white54)));
     }
 
     final res = widget.result!;
@@ -39,10 +39,8 @@ class _TrackMapTabState extends State<TrackMapTab> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Data Card (Just showing index/total for now, can expand)
               _DataCard("Track Points", "$_currentIndex / $maxIndex"),
               
-              // Track Toggle Switch
               Row(
                 children: [
                   const Text("Endurance", style: TextStyle(color: Colors.white70)),
