@@ -116,9 +116,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       case 0: return const ChassisTab();
       case 1: return const AeroTab();
       case 2: return const PowertrainTab();
-      case 3: return const TiresTab();
+      case 3: return const TireTab(); 
       case 4: return const KinematicsTab();
-      case 5: return AnalysisTab(result: _simulationResult);
+      case 5: return AnalysisTab(result: _simulationResult); 
       case 6: return TrackMapTab(result: _simulationResult);
       default: return const SizedBox();
     }
