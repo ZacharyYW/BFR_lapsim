@@ -14,6 +14,8 @@ import '../widgets/config_tabs/powertrain_tab.dart';
 import '../widgets/config_tabs/tires_tab.dart';
 import '../widgets/config_tabs/kinematics_tab.dart';
 
+import '../tabs/analysis_tab.dart';
+
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import '../models/vehicle_config.dart';
@@ -11,6 +12,16 @@ class SimulationService {
   static const String _executableName = 'Lap_Sim_CLI.exe';
   
   Future<SimulationResult> runSimulation(VehicleConfig config) async {
+    if (!Platform.isWindows) {
+      print("Non-Windows detected. Loading cached replay data...");
+      // Simulates a delay so it feels real
+      await Future.delayed(const Duration(seconds: 1));
+      
+      // Load the file you copied from Windows
+      final jsonString = await rootBundle.loadString('assets/data/test_output.json');
+      final outputJson = jsonDecode(jsonString);
+      return SimulationResult.fromJson(outputJson);
+    }
     try {
       // 1. Setup Paths
       // We use a temporary directory for JSON files to avoid clutter

@@ -4,15 +4,20 @@ part 'simulation_result.g.dart';
 
 @JsonSerializable()
 class SimulationResult {
-  // Telemetry Traces (Time vs Value)
-  // We use List<double> because JSON is simple. 
-  // Index 0 is time 0.0s, Index 1 is time 0.1s, etc.
+  // --- Telemetry Traces ---
   final List<double> timeTrace;
   final List<double> velocityTrace;     // ft/s
   final List<double> latAccelTrace;     // G's
   final List<double> longAccelTrace;    // G's
 
-  // Event Scorecard (Calculated in Section 17 of Lap_Sim.m)
+  // --- NEW: Track Map Coordinates (Phase 4) ---
+  // These match the fields we just added to Lap_Sim_CLI.m
+  final List<double> xTraceEndurance;
+  final List<double> yTraceEndurance;
+  final List<double> xTraceAutocross;
+  final List<double> yTraceAutocross;
+
+  // --- Event Scorecard ---
   final double enduranceScore;
   final double autocrossScore;
   final double skidpadScore;
@@ -24,6 +29,12 @@ class SimulationResult {
     required this.velocityTrace,
     required this.latAccelTrace,
     required this.longAccelTrace,
+    // Add the new required fields here
+    required this.xTraceEndurance,
+    required this.yTraceEndurance,
+    required this.xTraceAutocross,
+    required this.yTraceAutocross,
+    
     required this.enduranceScore,
     required this.autocrossScore,
     required this.skidpadScore,
@@ -31,6 +42,7 @@ class SimulationResult {
     required this.totalPoints,
   });
 
+  // Connects to the generated code
   factory SimulationResult.fromJson(Map<String, dynamic> json) => _$SimulationResultFromJson(json);
   Map<String, dynamic> toJson() => _$SimulationResultToJson(this);
 }
