@@ -24,6 +24,26 @@ SimulationResult _$SimulationResultFromJson(Map<String, dynamic> json) =>
           (json['longAccelTrace'] as List<dynamic>)
               .map((e) => (e as num).toDouble())
               .toList(),
+      timeTraceAx:
+          (json['timeTraceAx'] as List<dynamic>?)
+              ?.map((e) => (e as num).toDouble())
+              .toList() ??
+          [],
+      velocityTraceAx:
+          (json['velocityTraceAx'] as List<dynamic>?)
+              ?.map((e) => (e as num).toDouble())
+              .toList() ??
+          [],
+      latAccelTraceAx:
+          (json['latAccelTraceAx'] as List<dynamic>?)
+              ?.map((e) => (e as num).toDouble())
+              .toList() ??
+          [],
+      longAccelTraceAx:
+          (json['longAccelTraceAx'] as List<dynamic>?)
+              ?.map((e) => (e as num).toDouble())
+              .toList() ??
+          [],
       xTraceEndurance:
           (json['xTraceEndurance'] as List<dynamic>)
               .map((e) => (e as num).toDouble())
@@ -53,6 +73,10 @@ Map<String, dynamic> _$SimulationResultToJson(SimulationResult instance) =>
       'velocityTrace': instance.velocityTrace,
       'latAccelTrace': instance.latAccelTrace,
       'longAccelTrace': instance.longAccelTrace,
+      'timeTraceAx': instance.timeTraceAx,
+      'velocityTraceAx': instance.velocityTraceAx,
+      'latAccelTraceAx': instance.latAccelTraceAx,
+      'longAccelTraceAx': instance.longAccelTraceAx,
       'xTraceEndurance': instance.xTraceEndurance,
       'yTraceEndurance': instance.yTraceEndurance,
       'xTraceAutocross': instance.xTraceAutocross,

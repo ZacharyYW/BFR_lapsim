@@ -25,11 +25,17 @@ class _TrackMapTabState extends State<TrackMapTab> {
     // Select data based on toggle
     final xTrace = _showAutocross ? res.xTraceAutocross : res.xTraceEndurance;
     final yTrace = _showAutocross ? res.yTraceAutocross : res.yTraceEndurance;
+    final timeTrace = _showAutocross ? res.timeTraceAx : res.timeTrace;
     
     // Safety check for index
     int maxIndex = xTrace.length - 1;
     // Map current time percentage to new track if we switch
     if (_currentIndex > maxIndex) _currentIndex = maxIndex;
+
+    double currentTime = 0.0;
+    if (timeTrace.isNotEmpty && _currentIndex < timeTrace.length) {
+      currentTime = timeTrace[_currentIndex];
+    }
 
     return Column(
       children: [
@@ -39,7 +45,7 @@ class _TrackMapTabState extends State<TrackMapTab> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _DataCard("Track Points", "$_currentIndex / $maxIndex"),
+              _DataCard("Current Time", "${currentTime.toStringAsFixed(3)} s"),
               
               Row(
                 children: [
@@ -50,7 +56,7 @@ class _TrackMapTabState extends State<TrackMapTab> {
                     onChanged: (val) {
                       setState(() {
                         _showAutocross = val;
-                        _currentIndex = 0; // Reset scrubber on switch
+                        _currentIndex = 0;
                       });
                     },
                   ),
@@ -66,17 +72,18 @@ class _TrackMapTabState extends State<TrackMapTab> {
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: LineChart(
+              duration: Duration.zero,
               LineChartData(
                 lineBarsData: [
-                  // Track Path
+                  
                   LineChartBarData(
                     spots: _getTrackPath(xTrace, yTrace),
-                    isCurved: true,
+                    isCurved: false,
                     color: Colors.white24,
                     barWidth: 4,
                     dotData: FlDotData(show: false),
                   ),
-                  // Ghost Car
+
                   LineChartBarData(
                     spots: [FlSpot(xTrace[_currentIndex], yTrace[_currentIndex])],
                     color: _showAutocross ? Colors.orangeAccent : Colors.blueAccent,
@@ -113,9 +120,18 @@ class _TrackMapTabState extends State<TrackMapTab> {
 
   List<FlSpot> _getTrackPath(List<double> x, List<double> y) {
     final List<FlSpot> spots = [];
-    // Downsample for performance (every 5th point)
-    for (int i = 0; i < x.length; i += 5) {
-      spots.add(FlSpot(x[i], y[i]));
+    
+    if (x.isEmpty || y.isEmpty) return spots;
+
+    for (int i = 0; i < x.length; i++) {
+      double currentX = x[i];
+      double currentY = y[i];
+
+      if (currentX == 0.0 && currentY == 0.0) {
+        continue; 
+      }
+
+      spots.add(FlSpot(currentX, currentY));
     }
     return spots;
   }

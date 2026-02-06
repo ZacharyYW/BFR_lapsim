@@ -12,9 +12,9 @@ import '../widgets/config_tabs/powertrain_tab.dart';
 import '../widgets/config_tabs/tires_tab.dart';
 import '../widgets/config_tabs/kinematics_tab.dart';
 
-// Import new tabs
 import '../tabs/analysis_tab.dart';
 import '../tabs/track_map_tab.dart';
+import '../tabs/scores_tab.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -54,7 +54,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Optimum Mindstorm Dashboard'),
+        title: const Text('Brown Formula Racing - Lap Time Simulator'),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 20),
@@ -96,6 +96,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               NavigationRailDestination(icon: Icon(Icons.pivot_table_chart), label: Text('Kinematics')),
               NavigationRailDestination(icon: Icon(Icons.analytics), label: Text('Analysis')),
               NavigationRailDestination(icon: Icon(Icons.map), label: Text('Track Map')),
+              NavigationRailDestination(icon: Icon(Icons.emoji_events),label: Text('Scores'),),
             ],
           ),
           const VerticalDivider(thickness: 1, width: 1),
@@ -120,6 +121,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       case 4: return const KinematicsTab();
       case 5: return AnalysisTab(result: _simulationResult); 
       case 6: return TrackMapTab(result: _simulationResult);
+      case 7: return ScoresTab(result: _simulationResult);
       default: return const SizedBox();
     }
   }

@@ -1,156 +1,144 @@
-import 'package:fl_chart/fl_chart.dart';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import '../models/simulation_result.dart';
+import '../widgets/charts/ggv_diagram.dart';
+import '../widgets/charts/velocity_chart.dart';
+import '../widgets/charts/gforce_chart.dart';
 
-class AnalysisTab extends StatelessWidget {
+class AnalysisTab extends StatefulWidget {
   final SimulationResult? result;
 
   const AnalysisTab({super.key, required this.result});
 
   @override
+  State<AnalysisTab> createState() => _AnalysisTabState();
+}
+
+class _AnalysisTabState extends State<AnalysisTab> {
+  bool _showGForce = false;
+  bool _showAutocross = false; 
+
+  @override
   Widget build(BuildContext context) {
-    if (result == null) {
-      return const Center(
-        child: Text("Run a simulation to view analysis data.",
-            style: TextStyle(color: Colors.white54)),
-      );
+    if (widget.result == null) {
+      return const Center(child: Text("Run simulation to view analysis.", style: TextStyle(color: Colors.white54)));
     }
+
+    final res = widget.result!;
+    
+    // SWITCH DATA BASED ON TOGGLE
+    final time = _showAutocross ? res.timeTraceAx : res.timeTrace;
+    final velocity = _showAutocross ? res.velocityTraceAx : res.velocityTrace;
+    final latAccel = _showAutocross ? res.latAccelTraceAx : res.latAccelTrace;
+    final longAccel = _showAutocross ? res.longAccelTraceAx : res.longAccelTrace;
+
+    // Recalculate stats for the selected track
+    final maxSpeed = velocity.isNotEmpty ? velocity.reduce(max) : 0.0;
+    final maxLatG = latAccel.isNotEmpty ? latAccel.reduce((a, b) => a.abs() > b.abs() ? a : b).abs() : 0.0;
+    final maxLongG = longAccel.isNotEmpty ? longAccel.reduce((a, b) => a.abs() > b.abs() ? a : b) : 0.0;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text("Friction Circle (GGV)",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
-          const SizedBox(height: 10),
-          _buildGGVChart(result!),
-          const SizedBox(height: 30),
-          const Text("Telemetry Traces",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
-          const SizedBox(height: 10),
-          _buildVelocityChart(result!),
-          const SizedBox(height: 20),
-          _buildGForceChart(result!),
-        ],
-      ),
-    );
-  }
-
-  // --- WIDGET: FRICTION CIRCLE (GGV) ---
-  Widget _buildGGVChart(SimulationResult data) {
-    final spots = <ScatterSpot>[];
-    for (int i = 0; i < data.latAccelTrace.length; i += 5) {
-      spots.add(ScatterSpot(
-        data.latAccelTrace[i], 
-        data.longAccelTrace[i],
-        // UPDATED FOR NEW FL_CHART API
-        dotPainter: FlDotCirclePainter(
-          radius: 2,
-          color: _getColorForG(data.latAccelTrace[i], data.longAccelTrace[i]),
-          strokeWidth: 0,
-        ),
-      ));
-    }
-
-    return Container(
-      height: 300,
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1E1E2C),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: ScatterChart(
-        ScatterChartData(
-          scatterSpots: spots,
-          minX: -2.5, maxX: 2.5,
-          minY: -2.5, maxY: 2.5,
-          gridData: FlGridData(show: true, drawVerticalLine: true),
-          borderData: FlBorderData(show: true, border: Border.all(color: Colors.white12)),
-          titlesData: FlTitlesData(show: false),
-        ),
-      ),
-    );
-  }
-
-  // --- WIDGET: VELOCITY TRACE ---
-  Widget _buildVelocityChart(SimulationResult data) {
-    final points = <FlSpot>[];
-    for (int i = 0; i < data.timeTrace.length; i += 10) {
-      points.add(FlSpot(data.timeTrace[i], data.velocityTrace[i]));
-    }
-
-    return _buildLineChartContainer("Velocity (ft/s)", points, Colors.blueAccent);
-  }
-
-  // --- WIDGET: G-FORCE TRACE (Lat vs Long) ---
-  Widget _buildGForceChart(SimulationResult data) {
-    final latPoints = <FlSpot>[];
-    final longPoints = <FlSpot>[];
-    
-    for (int i = 0; i < data.timeTrace.length; i += 10) {
-      latPoints.add(FlSpot(data.timeTrace[i], data.latAccelTrace[i]));
-      longPoints.add(FlSpot(data.timeTrace[i], data.longAccelTrace[i]));
-    }
-
-    return Container(
-      height: 200,
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1E1E2C),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: LineChart(
-        LineChartData(
-          lineBarsData: [
-            LineChartBarData(spots: latPoints, color: Colors.cyan, dotData: FlDotData(show: false)),
-            LineChartBarData(spots: longPoints, color: Colors.orange, dotData: FlDotData(show: false)),
-          ],
-          titlesData: FlTitlesData(show: false),
-          gridData: FlGridData(show: true, drawVerticalLine: false),
-          borderData: FlBorderData(show: false),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLineChartContainer(String title, List<FlSpot> points, Color color) {
-    return Container(
-      height: 200,
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1E1E2C),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: [
-          Text(title, style: const TextStyle(color: Colors.white70, fontSize: 12)),
-          Expanded(
-            child: LineChart(
-              LineChartData(
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: points,
-                    color: color,
-                    dotData: FlDotData(show: false),
-                    belowBarData: BarAreaData(show: true, color: color.withOpacity(0.1)),
+          // HEADER WITH TOGGLE
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+               const Text("Analysis", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+               Row(
+                children: [
+                  const Text("Endurance", style: TextStyle(color: Colors.white70)),
+                  Switch(
+                    value: _showAutocross,
+                    activeColor: Colors.orangeAccent,
+                    onChanged: (val) => setState(() => _showAutocross = val),
                   ),
+                  const Text("Autocross", style: TextStyle(color: Colors.white70)),
                 ],
-                titlesData: FlTitlesData(show: false),
-                gridData: FlGridData(show: true, drawVerticalLine: false),
-                borderData: FlBorderData(show: false),
               ),
-            ),
+            ],
           ),
+          const SizedBox(height: 16),
+
+          // 1. SUMMARY CARDS
+          Row(
+            children: [
+              _SummaryCard("Top Speed", "${maxSpeed.toStringAsFixed(1)} ft/s", Colors.blueAccent),
+              const SizedBox(width: 12),
+              _SummaryCard("Max Lat G", "${maxLatG.toStringAsFixed(2)} G", Colors.orangeAccent),
+              const SizedBox(width: 12),
+              _SummaryCard("Peak Brake", "${maxLongG.abs().toStringAsFixed(2)} G", Colors.redAccent),
+            ],
+          ),
+          const SizedBox(height: 24),
+
+          // 2. GGV DIAGRAM (Imported Widget)
+          const Text("GGV Diagram", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 16),
+          GGVDiagram(latAccel: latAccel, longAccel: longAccel),
+
+          const SizedBox(height: 24),
+
+          // 3. TELEMETRY TRACES (Imported Widgets)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text("Telemetry", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+              Row(
+                children: [
+                  _ChartToggle("Velocity", !_showGForce, () => setState(() => _showGForce = false)),
+                  const SizedBox(width: 8),
+                  _ChartToggle("G-Force", _showGForce, () => setState(() => _showGForce = true)),
+                ],
+              )
+            ],
+          ),
+          const SizedBox(height: 16),
+          
+          _showGForce 
+            ? GForceChart(time: time, latAccel: latAccel, longAccel: longAccel)
+            : VelocityChart(time: time, velocity: velocity),
         ],
       ),
     );
   }
 
-  Color _getColorForG(double lat, double long) {
-    double magnitude = (lat * lat) + (long * long);
-    if (magnitude > 2.0) return Colors.red;
-    if (magnitude > 1.0) return Colors.yellow;
-    return Colors.green;
+  // --- WIDGETS (Internal Helpers for Analysis Tab) ---
+
+  Widget _SummaryCard(String title, String value, Color color) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: color.withOpacity(0.3)),
+        ),
+        child: Column(
+          children: [
+            Text(value, style: TextStyle(color: color, fontSize: 20, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 4),
+            Text(title, style: TextStyle(color: color.withOpacity(0.7), fontSize: 12)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _ChartToggle(String text, bool isActive, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: isActive ? Colors.blueAccent : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: isActive ? Colors.blueAccent : Colors.white24),
+        ),
+        child: Text(text, style: TextStyle(color: isActive ? Colors.white : Colors.white54, fontSize: 12)),
+      ),
+    );
   }
 }
