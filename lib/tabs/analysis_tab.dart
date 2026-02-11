@@ -77,7 +77,12 @@ class _AnalysisTabState extends State<AnalysisTab> {
           // 2. GGV DIAGRAM (Imported Widget)
           const Text("GGV Diagram", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 16),
-          GGVDiagram(latAccel: latAccel, longAccel: longAccel),
+          // FIXED: Added velocity parameter here
+          GGVDiagram(
+            latAccel: latAccel, 
+            longAccel: longAccel,
+            velocity: velocity, 
+          ),
 
           const SizedBox(height: 24),
 

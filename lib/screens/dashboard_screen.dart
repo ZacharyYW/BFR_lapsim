@@ -15,6 +15,7 @@ import '../widgets/config_tabs/kinematics_tab.dart';
 import '../tabs/analysis_tab.dart';
 import '../tabs/track_map_tab.dart';
 import '../tabs/scores_tab.dart';
+import '../tabs/batch_simulation_tab.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -87,7 +88,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
             unselectedIconTheme: const IconThemeData(color: Colors.white54),
             selectedLabelTextStyle: const TextStyle(color: Colors.blueAccent),
             unselectedLabelTextStyle: const TextStyle(color: Colors.white54),
-            // NOTE: This list uses 'const' which is fine because these icons/text ARE constant
             destinations: const [
               NavigationRailDestination(icon: Icon(Icons.directions_car), label: Text('Chassis')),
               NavigationRailDestination(icon: Icon(Icons.air), label: Text('Aero')),
@@ -97,6 +97,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               NavigationRailDestination(icon: Icon(Icons.analytics), label: Text('Analysis')),
               NavigationRailDestination(icon: Icon(Icons.map), label: Text('Track Map')),
               NavigationRailDestination(icon: Icon(Icons.emoji_events),label: Text('Scores'),),
+              NavigationRailDestination(icon: Icon(Icons.linear_scale), label: Text('Sweep')),
             ],
           ),
           const VerticalDivider(thickness: 1, width: 1),
@@ -122,6 +123,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       case 5: return AnalysisTab(result: _simulationResult); 
       case 6: return TrackMapTab(result: _simulationResult);
       case 7: return ScoresTab(result: _simulationResult);
+      case 8: return BatchSimulationTab();
       default: return const SizedBox();
     }
   }
