@@ -58,6 +58,7 @@ dependencies:
   # Vector Diagrams
   # Used to draw 3D diagrams for GGV.
   vector_math: ^2.1.4
+  path: ^1.9.1
 
 dev_dependencies:
   flutter_test:
