@@ -247,8 +247,10 @@ class _BatchSimulationTabState extends State<BatchSimulationTab> {
                   decoration: const BoxDecoration(color: Colors.white24),
                   children: const [
                     Padding(padding: EdgeInsets.all(8.0), child: Text("Value", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
-                    Padding(padding: EdgeInsets.all(8.0), child: Text("Endurance (s)", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
-                    Padding(padding: EdgeInsets.all(8.0), child: Text("Autocross (s)", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+                    Padding(padding: EdgeInsets.all(8.0), child: Text("Endurance", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+                    Padding(padding: EdgeInsets.all(8.0), child: Text("Autocross", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+                    Padding(padding: EdgeInsets.all(8.0), child: Text("Skidpad", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+                    Padding(padding: EdgeInsets.all(8.0), child: Text("Acceleration", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
                     Padding(padding: EdgeInsets.all(8.0), child: Text("Total Points", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
                   ],
                 ),
@@ -258,8 +260,10 @@ class _BatchSimulationTabState extends State<BatchSimulationTab> {
                   return TableRow(
                     children: [
                       Padding(padding: const EdgeInsets.all(8.0), child: Text(val.toString(), style: const TextStyle(color: Colors.white70))),
-                      Padding(padding: const EdgeInsets.all(8.0), child: Text(res.timeTrace.last.toStringAsFixed(3), style: const TextStyle(color: Colors.white70))),
-                      Padding(padding: const EdgeInsets.all(8.0), child: Text(res.timeTraceAx.last.toStringAsFixed(3), style: const TextStyle(color: Colors.white70))),
+                      Padding(padding: const EdgeInsets.all(8.0), child: Text(res.enduranceScore.toStringAsFixed(3), style: const TextStyle(color: Colors.white70))),
+                      Padding(padding: const EdgeInsets.all(8.0), child: Text(res.autocrossScore.toStringAsFixed(3), style: const TextStyle(color: Colors.white70))),
+                      Padding(padding: const EdgeInsets.all(8.0), child: Text(res.skidpadScore.toStringAsFixed(3), style: const TextStyle(color: Colors.white70))),
+                      Padding(padding: const EdgeInsets.all(8.0), child: Text(res.accelerationScore.toStringAsFixed(3), style: const TextStyle(color: Colors.white70))),
                       Padding(padding: const EdgeInsets.all(8.0), child: Text(res.totalPoints.toStringAsFixed(1), style: const TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.bold))),
                     ],
                   );

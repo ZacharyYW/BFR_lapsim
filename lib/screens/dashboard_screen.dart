@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../services/simulation_service.dart';
-import '../models/vehicle_config.dart';
 import '../models/simulation_result.dart';
 import '../notifiers/vehicle_notifier.dart';
 
